@@ -14,8 +14,6 @@
     <div id="category">
 
     </div>
-
-
 </form>
 <table id="basic-datatable" class="table dt-responsive nowrap">
     <thead>
@@ -41,17 +39,23 @@
 
 <script>
 
-    function getListProduct() {
-        $.ajax({
-            url: "/api/product",
-            type: "GET"
-        }).done(function (resp) {
+    function SelectProduct() {
+        $("form div").on("click", ".category", function () {
+            let id = $(this).data("id");
 
-            let str = '';
+            $.ajax({
+                headers: {
+                    'Accept':'application/json',
+                    'Content-Type':'application/json'
+                },
+                url: "/api/product/category/" + id,
+                type: "GET"
+            }).done(function (resp) {
+                let str = '';
+                $("#tbListProduct tr").remove();
+                $.each(resp, function(index, item) {
 
-            $.each(resp, function(index, item) {
-
-                str = `
+                    str = `
                         <tr id="tr_${item.id}">
                             <th scope="row">${item.id}</th>
                             <td>${item.name}</td>
@@ -70,6 +74,41 @@
 
                         </tr>
                     `;
+
+
+                    $("#tbListProduct").prepend(str);
+                });
+
+            }).fail(function () {
+                alert("ERROR")
+            });
+        })
+    }
+
+    function getListProduct() {
+        $.ajax({
+            url: "/api/product",
+            type: "GET"
+        }).done(function (resp) {
+
+            let str = '';
+
+            $.each(resp, function(index, item) {
+
+                str = `
+                        <tr id="tr_${item.id}">
+                            <th scope="row">${item.id}</th>
+                            <td>${item.name}</td>
+                            <td>${item.price}</td>
+                            <td>
+                                <button type="button" class="btn btn-outline-primary plus"
+                                    data-id="${item.id}">
+                                    Chọn món
+                                </button>
+                            </td>
+
+                        </tr>
+                    `;
                 $("#tbListProduct").prepend(str);
             });
 
@@ -83,6 +122,8 @@
         });
     }
 
+
+
     function getAllCategory() {
         return $.ajax({
             url: "/api/category",
@@ -93,7 +134,7 @@
 
             $.each(resp, function(index, item) {
                 str = `
-                    <button type="button" data-id="${item.id}">
+                    <button type="button" class="btn btn-outline-primary category" data-id="${item.id}">
                     ${item.name}</button>
                 `;
                 $("#category").prepend(str);
@@ -106,6 +147,7 @@
     $(document).ready(function () {
         getAllCategory();
         getListProduct();
+        SelectProduct();
     });
 </script>
 </body>

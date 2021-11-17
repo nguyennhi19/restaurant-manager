@@ -45,4 +45,9 @@ public class ProductService implements IProductService{
     public Optional<ProductDTO> findByIdPDTO(Long id) {
         return productRepository.findByIdPDTO(id);
     }
+
+    @Override
+    public List<ProductDTO> findByCategoryIdPDTO(Long id) {
+        return productRepository.findByCategoryIdPDTO(id);
+    }
 }

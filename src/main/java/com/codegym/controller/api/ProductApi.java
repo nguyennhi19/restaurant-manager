@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -38,6 +39,14 @@ public class ProductApi {
     public ProductDTO createId(@PathVariable Long id) {
 
         ProductDTO product = iProductService.findByIdPDTO(id).get();
+
+        return product;
+    }
+
+    @GetMapping("/category/{id}")
+    public List<ProductDTO> selectCategory(@PathVariable Long id) {
+
+        List<ProductDTO> product = iProductService.findByCategoryIdPDTO(id);
 
         return product;
     }

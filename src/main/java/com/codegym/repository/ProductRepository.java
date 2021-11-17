@@ -16,4 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT NEW com.codegym.model.dto.ProductDTO(u.id, u.name, u.price, u.status, u.category ) FROM Product u where  u.id = ?1")
     Optional<ProductDTO> findByIdPDTO(Long id);
+
+    @Query("SELECT NEW com.codegym.model.dto.ProductDTO(u.id, u.name, u.price, u.status, u.category ) FROM Product u where  u.category.id = ?1")
+    List<ProductDTO> findByCategoryIdPDTO(Long id);
 }
