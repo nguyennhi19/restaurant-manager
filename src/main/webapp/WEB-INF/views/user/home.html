@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello</title>
+    <link href="/resource/bootstrap-4.6.0-dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" id="bootstrap-stylesheet">
+    <link rel="stylesheet" href="/resource/font-awesome-4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="/resource/css/style.css">
+
+</head>
+<body>
+
+<header>
+    <form>
+        <div class="form-group row">
+            <div class="col-4">
+                <label for="Name">Name</label>
+                <input type="text" class="form-control" id="name">
+            </div>
+            <div class="col-4">
+                <label for="price">price</label>
+                <input type="number" class="form-control" id="price">
+            </div>
+            <div class="col-4">
+                <label for="category">category</label>
+                <select id="category" class="select form-control">
+                </select>
+            </div>
+        </div>
+        <button type="button" id="btnCreate" class="btn btn-primary">Create product</button>
+        <button type="button" id="btnPrint" class="btn btn-primary">Print</button>
+        <button type="button" id="showModal">Show Modal</button>
+    </form>
+</header>
+<div class="card-body">
+    <h4 class="header-title">Thực đơn </h4>
+    <table id="basic-datatable" class="table dt-responsive nowrap">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Category</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody id="tbListProduct">
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal update product</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group row">
+                        <div class="col-1">
+                            <label for="idUp">ID</label>
+                            <input type="text" class="form-control" id="idUp" readonly>
+                        </div>
+                        <div class="col-3">
+                            <label for="nameUp">Name</label>
+                            <input type="text" class="form-control" id="nameUp">
+                        </div>
+                        <div class="col-3">
+                            <label for="priceUp">price</label>
+                            <input type="number" class="form-control" id="priceUp">
+                        </div>
+                        <div class="col-3">
+                            <label for="categoryUp">category</label>
+                            <select id="categoryUp" class="select form-control">
+                            </select>
+                        </div>
+                        <div class="custom-control custom-checkbox mb-3 col-2">
+                            <input type="checkbox" class="custom-control-input" id="statusUp" name="status">
+                            <label class="custom-control-label" for="statusUp">Status</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="btnUpdate" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/resource/js/jquery-3.6.0.min.js"></script>
+<script src="/resource/bootstrap-4.6.0-dist/js/bootstrap.min.js"></script>
+<script src="/resource/bootstrap-4.6.0-dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.4/vfs_fonts.js"></script>
+
+<script src="/resource/js/sweetalert2.min.js"></script>
+<script src="/resource/page/js/app.js"></script>
+
+<script>
+    let product = new Product();
+    let category = new Category();
+
+    $("#btnCreate").on("click", function () {
+        createProduct();
+    })
+
+    $("#btnPrint").on("click", function () {
+        // pdfMake.vfs = pdfFonts.pdfMake.vfs;
+        // pdfMake.fonts = {
+        //     ipagp: {
+        //         normal: "ipagp.ttf",
+        //         bold: "ipagp.ttf",
+        //         italics: "ipagp.ttf",
+        //         bolditalics: "ipagp.ttf",
+        //     }
+        // };
+        // pdfMake.fonts = {
+        //     Roboto: {
+        //         normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
+        //         bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
+        //         italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
+        //         bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
+        //     },
+        // }
+        let abc = "PI MAP";
+        const documentDefinition = {
+            pageMargins: [30, 10, 30, 10],
+            content: [
+                { text: abc, bold: true, fontSize: 20},
+                { text: '225 tang bat ho, thanh pho hue', italics: true, fontSize: 10},
+                { text: 'Bàn 2 (Trong nhà)', bold: true, fontSize: 20},
+                { text: 'Thời gian: 12/11/2021 02:20 PM - 02:21 PM', fontSize: 10},
+                {
+                    columns: [
+                        {
+                            text: "Nhân viên: Admin",
+                            width: 150,
+                        },
+                        {
+                            text: "No.1715500013",
+                            width: 150,
+                        }
+                    ]
+                },
+
+            ],
+            defaultStyle: {
+                font: 'Roboto'
+            }
+        };
+
+        pdfMake.createPdf(documentDefinition).open();
+        console.log("111")
+    })
+
+
+    $("#btnUpdate").on("click", function () {
+        updateProduct();
+    })
+
+    function handleDelete() {
+        $("table tbody tr").on("click", ".delete", function () {
+            let id = $(this).data("id");
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    $.ajax({
+                        headers: {
+                            'Accept':'application/json',
+                            'Content-Type':'application/json'
+                        },
+                        url: "/api/product/delete/" + id,
+                        type: "GET"
+                    }).done(function (resp) {
+
+                        console.log(resp)
+
+                        if (resp === true) {
+
+                            $("#tr_" + id).remove();
+
+                            Swal.fire(
+                                'Deleted!',
+                                'This product has been deleted.',
+                                'success'
+                            )
+                        } else {
+                            alert("UnSuccess deleted")
+                        }
+
+                    }).fail(function () {
+                        alert("UnSuccess deleted 2")
+                    });
+
+                }
+            })
+
+        });
+    }
+
+    function handleEdit() {
+        $("table tbody tr").on("click", ".edit", function () {
+            let id = $(this).data("id");
+
+            console.log("id = " + id)
+
+
+            $.ajax({
+                headers: {
+                    'Accept':'application/json',
+                    'Content-Type':'application/json'
+                },
+                url: "/api/product/" + id,
+                type: "GET"
+            }).done(function (resp) {
+                $("#idUp").val(resp.id);
+                $("#nameUp").val(resp.name);
+                $("#priceUp").val(resp.price);
+                $('#statusUp').prop('checked', resp.status);
+                $("#categoryUp").val(resp.category.id);
+            }).fail(function () {
+                alert("ERROR")
+            });
+        })
+    }
+
+    function createProduct() {
+        category.id = $("#category").val();
+        category.name=$("#category :selected").text();
+
+        product.name = $("#name").val();
+        product.price = $("#price").val();
+        product.category = category
+        console.log(product);
+
+        $.ajax({
+            headers: {
+                'Accept':'application/json',
+                'Content-Type':'application/json'
+            },
+            url: "/api/product/create",
+            type: "POST",
+            data: JSON.stringify(product)
+
+        }).done(function (resp) {
+
+            let str = '';
+
+            str = `
+                    <tr id="tr_${resp.id}">
+                            <th scope="row">${resp.id}</th>
+                            <td>${resp.name}</td>
+                            <td>${resp.price}</td>
+                            <td>${resp.status}</td>
+                            <td>${resp.category.name}</td>
+                            <td>
+                                <button type="button" data-toggle="modal" data-target="#updateModal" class="btn btn-outline-primary edit"
+                                    data-id="${resp.id}"
+                                >
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    Edit
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-outline-danger delete" data-id="${resp.id}">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                    Delete
+                                </button>
+                            </td>
+
+                        </tr>
+                `;
+
+            $("#tbListProduct").prepend(str);
+
+
+            handleEdit();
+
+            handleDelete();
+
+        }).fail(function () {
+            alert("ERROR")
+        });
+    }
+
+    function updateProduct() {
+
+        product.id = $("#idUp").val();
+        product.name = $("#nameUp").val();
+        product.price = $("#priceUp").val();
+        product.status = $('#statusUp').is(":checked");
+        product.category = {
+            id: $("#categoryUp").val(),
+            name: $("#categoryUp :selected").text()
+        };
+        console.log("đã vào" + product);
+
+        $.ajax({
+            headers: {
+                'Accept':'application/json',
+                'Content-Type':'application/json'
+            },
+            url: "/api/product/update",
+            type: "POST",
+            data: JSON.stringify(product)
+        }).done(function (resp) {
+
+            let str = '';
+
+            str = `
+                    <tr id="tr_${resp.id}">
+                        <th scope="row">${resp.id}</th>
+                        <td>${resp.name}</td>
+                        <td>${resp.price}</td>
+                        <td>${resp.status}</td>
+                        <td>${resp.category.name}</td>
+                        <td>
+                            <button type="button" data-toggle="modal" data-target="#updateModal" class="btn btn-outline-primary edit"
+                                data-id="${resp.id}"
+                            >
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                Edit
+                            </button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-outline-danger delete" data-id="${resp.id}">
+                                <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            console.log("đã vào");
+            $("#tr_"+ product.id).replaceWith(str);
+            $("#updateModal").modal("hide");
+
+            handleEdit();
+
+            handleDelete();
+
+        }).fail(function () {
+            alert("ERROR")
+        });
+    }
+    function getListProduct() {
+        $.ajax({
+            url: "/api/product",
+            type: "GET"
+        }).done(function (resp) {
+
+            let str = '';
+
+            $.each(resp, function(index, item) {
+
+
+
+                console.log(item);
+                str = `
+                        <tr id="tr_${item.id}">
+                            <th scope="row">${item.id}</th>
+                            <td>${item.name}</td>
+                            <td>${item.price}</td>
+                            <td>${item.status}</td>
+                            <td>${item.category.name}</td>
+                            <td>
+                                <button type="button" data-toggle="modal" data-target="#updateModal" class="btn btn-outline-primary edit"
+                                    data-id="${item.id}"
+                                >
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    Edit
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-outline-danger delete" data-id="${item.id}">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                    Delete
+                                </button>
+                            </td>
+
+                        </tr>
+                    `;
+                $("#tbListProduct").prepend(str);
+            });
+
+
+            handleEdit();
+
+            handleDelete();
+
+        }).fail(function () {
+            alert("ERROR")
+        });
+    }
+
+    function getAllCategory() {
+        return $.ajax({
+            url: "/api/category",
+            type: "GET"
+        }).done(function (resp) {
+
+            let str = '';
+
+            $.each(resp, function(index, item) {
+                str = `
+                        <option value="${item.id}">${item.name}</option>
+                    `;
+                $("#category").append(str);
+                $("#categoryUp").append(str);
+            })
+        }).fail(function () {
+            alert("ERROR")
+        });
+    }
+
+
+
+    $(document).ready(function () {
+        getListProduct();
+        getAllCategory();
+
+        $("#showModal").on("click",function () {
+            $("#updateModal").modal("show");
+        })
+
+    });
+
+</script>
+</body>
+</html>
+
